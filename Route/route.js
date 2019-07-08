@@ -19,8 +19,8 @@ module.exports = function(apps){
     // apps.delete('/cart/:id', cartController.deleteCart)
     // apps.patch('/cart/:id',cartController.updateCart)
 
-    // apps.get('./user', userController.getUser)
-    // apps.post('/user', userController.postUser)
+    apps.get('/user/:id', userController.getUser)
+    apps.post('/user', userController.postUser)
     // apps.delete('/user/:id', userController.deleteUser)
     // apps.patch('/user/:id', userController.updateUser)
 
