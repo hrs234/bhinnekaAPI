@@ -1,18 +1,15 @@
-//for connetion api to database
-require('dotenv/config')
-const mysql = require('mysql')
+require('dotenv/config');
+const mysql = require('mysql');
 
-const connect = mysql.createConnection({
-    host: process.env.HOST || 'localhost',
-    user:process.env.USER || 'root',
-    password: process.env.PASSWORD || '',
-    database: process.env.DATABASE || 'notes'
+const conn = mysql.createConnection({
+    host :  'remotemysql.com',
+    user : 'MBG4wcGA5t',
+    password : 'Hk3n35oPfP',
+    database : 'MBG4wcGA5t',
 })
 
-connect.connect (function(err){
-    if(err){
-        throw err;
-    }
+conn.connect (function(err){
+    if(err) throw err;
 })
 
-module.exports = connect
+module.exports = conn;
