@@ -9,13 +9,13 @@ module.exports = function(apps){
     const authController = require('../Controller/authController')
 
     apps.get('/',controler.hello)
-    // apps.get('/product',controler.product)
-    // apps.post('/product',controller.postProduct)
+    apps.get('/product',controler.getProduct)
+    apps.post('/product',controler.postProduct)
     // apps.delete('/pruduct/:id',controler.deleteProduct)
     // apps.patch('/pruduct/:id',controler.updateProduct)
 
-    // apps.get('/cart',cartController.cart)
-    // apps.post('/cart',cartController.postCart)
+    apps.get('/cart/:id',cartController.getCart)
+    apps.post('/cart',cartController.postCart)
     // apps.delete('/cart/:id', cartController.deleteCart)
     // apps.patch('/cart/:id',cartController.updateCart)
 
@@ -25,6 +25,10 @@ module.exports = function(apps){
     // apps.patch('/user/:id', userController.updateUser)
 
     // apps.get('./auth',authController.auth)
+
+    apps.get('/category', controler.getCategory)
+    apps.post('/category', controler.postCategory)
+
     
 
 }
