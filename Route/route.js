@@ -7,22 +7,26 @@ module.exports = function(apps){
     const cartController = require('../Controller/cartController')
     const userController = require('../Controller/userController')
     const authController = require('../Controller/authController')
+    const transactionController = require('../Controller/transactionController')
 
     apps.get('/',controler.hello)
     apps.get('/product',controler.getProduct)
     apps.post('/product',controler.postProduct)
-    // apps.delete('/pruduct/:id',controler.deleteProduct)
-    // apps.patch('/pruduct/:id',controler.updateProduct)
+    apps.delete('/product/:id',controler.deleteProduct)
+    apps.patch('/product/:id',controler.updateProduct)
 
     apps.get('/cart/:id',cartController.getCart)
     apps.post('/cart',cartController.postCart)
-    // apps.delete('/cart/:id', cartController.deleteCart)
-    // apps.patch('/cart/:id',cartController.updateCart)
+    apps.delete('/cart/:id', cartController.deleteCart)
+    apps.patch('/cart/:id',cartController.updateCart)
 
     apps.get('/user/:id', userController.getUser)
     apps.post('/user', userController.postUser)
-    // apps.delete('/user/:id', userController.deleteUser)
-    // apps.patch('/user/:id', userController.updateUser)
+    apps.delete('/user/:id', userController.deleteUser)
+    apps.patch('/user/:id', userController.updateUser)
+
+    apps.get('/transaction/:id',transactionController.getTransaction)
+    apps.post('/transaction',transactionController.postTransaction)
 
     // apps.get('./auth',authController.auth)
 

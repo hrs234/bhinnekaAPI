@@ -64,6 +64,45 @@ exports.getProduct = (req,res) =>{
     })
 }
 
+exports.deleteProduct = (req,res) =>{
+    let id = req.params.id
+    let sql = `delete from product where id_product = ${id}`
+
+    conn.query(sql, (error, rows) =>{
+        if (error) {
+            console.log(error)
+        }else{
+            res.send({
+                message: "product has been delete"
+            })
+        }
+    })
+}
+
+exports.updateProduct = (req,res) =>{
+    let id = req.params.id
+    let product = req.body.product
+    let price = req.body.price
+    let description = req.body.description
+    let image = req.body.image
+    let id_user = req.body.id_user
+    let id_category = req.body.id_category
+
+    let sql = `update product set product= "${product}", price="${price}", description="${description}", image= "${image}", id_user = "${id_user}", id_category = "${id_category}" where id_product = ${id}`
+
+    conn.query(sql, (error, rows) =>{
+        if (error) {
+            console.log(error)
+        }else{
+            res.send({
+                message: 'product have been update'
+            })
+        }
+    })
+
+
+}
+
 exports.postCategory = (req, res) =>{
     let category = req.body.category
     conn.query('insert into category set category=?',[category], (error, data) =>{
