@@ -40,3 +40,40 @@ exports.postUser = (req,res) =>{
         }
     })
 }
+
+exports.updateUser = (req, res) =>{
+    let id = req.params.id
+    let first_name = req.body.first_name
+    let last_name = req.body.last_name
+    let email = req.body.email
+    let gender = req.body.gender
+    let phone_number = req.body.phone_number
+    let brith_date = req.body.birth_date
+
+    let sql = `update user set first_name = "${first_name}", last_name = "${last_name}", email = "${email}", gender = "${gender}", phone_number = "${phone_number}", birth_date = "${brith_date}" where id_user = ${id}`
+
+    connect.query(sql, (error, rows) =>{
+        if (error) {
+            console.log(error)
+        }else{
+            res.send({
+                message: "data has been update"
+            })
+        }
+    })
+}
+
+exports.deleteUser = (req, res) =>{
+    let id = req.params.id
+    let sql = `delete from user where id_user = ${id}`
+
+    connect.query(sql, (error, rows) =>{
+        if (error) {
+            console.log(error)
+        }else{
+            res.send({
+                message:"Data Has Been Delete"
+            })
+        }
+    })
+}
