@@ -5,6 +5,8 @@ const connect = require('../Connection/connect');
 
 exports.getUser = (req,res) =>{
     let id = req.params.id;
+    const bearerHeader = req.header('auth');
+    console.log(bearerHeader)
     connect.query(`select * from user where id_user = ${id}`, (error, rows) =>{
         if(error){
             console.log(error)

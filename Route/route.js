@@ -8,6 +8,7 @@ module.exports = function(apps){
     const userController = require('../Controller/userController')
     const authController = require('../Controller/authController')
     const transactionController = require('../Controller/transactionController')
+    const verif = require('../Controller/verifytoken')
 
     apps.get('/',controler.hello)
     apps.get('/product',controler.getProduct)
@@ -20,7 +21,7 @@ module.exports = function(apps){
     apps.delete('/cart/:id', cartController.deleteCart)
     apps.patch('/cart/:id',cartController.updateCart)
 
-    apps.get('/user/:id', userController.getUser)
+    apps.get('/user/:id',verif, userController.getUser)
     apps.post('/user', userController.postUser)
     apps.delete('/user/:id', userController.deleteUser)
     apps.patch('/user/:id', userController.updateUser)
@@ -28,7 +29,7 @@ module.exports = function(apps){
     apps.get('/transaction/:id',transactionController.getTransaction)
     apps.post('/transaction',transactionController.postTransaction)
 
-    // apps.get('./auth',authController.auth)
+    apps.post('/auth',authController.postAuth)
 
     apps.get('/category', controler.getCategory)
     apps.post('/category', controler.postCategory)
