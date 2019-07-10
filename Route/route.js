@@ -27,6 +27,8 @@ module.exports = function(apps){
 
     apps.get('/transaction/:id',transactionController.getTransaction)
     apps.post('/transaction',transactionController.postTransaction)
+    apps.delete('/transaction', transactionController.deleteTransaction)
+    apps.update('/transaction', transactionController.updateTransaction)
 
     // apps.get('./auth',authController.auth)
 
