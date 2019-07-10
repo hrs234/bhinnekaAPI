@@ -8,6 +8,7 @@ module.exports = function(apps){
     const userController = require('../Controller/userController')
     const authController = require('../Controller/authController')
     const transactionController = require('../Controller/transactionController')
+
     const multer = require('multer')
 
     const storage = multer.diskStorage({
@@ -20,7 +21,7 @@ module.exports = function(apps){
     });
 
     let upload = multer({storage: storage})
-
+    const verif = require('../Controller/verifytoken')
     apps.get('/',controler.hello)
     apps.get('/product',controler.getProduct)
     apps.post('/product',upload.single('image'), controler.postImage)
@@ -32,8 +33,10 @@ module.exports = function(apps){
     apps.delete('/cart/:id', cartController.deleteCart)
     apps.patch('/cart/:id',cartController.updateCart)
 
-    apps.get('/user/:id', userController.getUser)
+
+    apps.get('/user/:id',verif, userController.getUser)
     apps.post('/user', upload.single('image'),userController.postUser)
+r
     apps.delete('/user/:id', userController.deleteUser)
     apps.patch('/user/:id', userController.updateUser)
 
@@ -42,8 +45,9 @@ module.exports = function(apps){
     apps.delete('/transaction', transactionController.deleteTransaction)
     apps.patch('/transaction', transactionController.updateTransaction)
 
-    // apps.get('./auth',authController.auth)
+    apps.post('/auth',authController.postAuth)
     apps.post('/upload',upload.single('image'), controler.postImage)
+
 
     apps.get('/category', controler.getCategory)
     apps.post('/category', controler.postCategory)
