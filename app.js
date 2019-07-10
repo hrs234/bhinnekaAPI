@@ -13,12 +13,9 @@ apps.use(
 
 apps.use(bodyParser.json());
 route(apps);
-//apps.get('/', (req, res) => res.send('hello world'))
 
 apps.listen(port)
 
 console.log(`http://localhost/${port}`);
-
-
 
 
