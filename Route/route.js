@@ -8,7 +8,9 @@ module.exports = function(apps){
     const userController = require('../Controller/userController')
     const authController = require('../Controller/authController')
     const transactionController = require('../Controller/transactionController')
-
+    const mailerController = require('../Controller/mailerController')
+    const forgetController = require('../Controller/forgetController')
+    const auth = require('../Middleware/verifytoken')
     const multer = require('multer')
 
     const storage = multer.diskStorage({
@@ -33,10 +35,9 @@ module.exports = function(apps){
     apps.delete('/cart/:id', cartController.deleteCart)
     apps.patch('/cart/:id',cartController.updateCart)
 
-
-    apps.get('/user/:id',verif, userController.getUser)
+    apps.get('/user/:id',auth, userController.getUser)
     apps.post('/user', upload.single('image'),userController.postUser)
-r
+
     apps.delete('/user/:id', userController.deleteUser)
     apps.patch('/user/:id', userController.updateUser)
 
@@ -46,14 +47,15 @@ r
     apps.patch('/transaction', transactionController.updateTransaction)
 
     apps.post('/auth',authController.postAuth)
-    apps.post('/upload',upload.single('image'), controler.postImage)
 
+    apps.patch('/auth/:id',authController.changeAuth)
+    apps.post('/upload',upload.single('image'), controler.postImage)
 
     apps.get('/category', controler.getCategory)
     apps.post('/category', controler.postCategory)
 
-    apps.post('/mutler',controler.postImage)
+    apps.get('/mail', mailerController)
+    apps.patch('/forget/:id', forgetController.forgetPassword)
 
-    
 
 }
