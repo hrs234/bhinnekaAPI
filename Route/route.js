@@ -8,8 +8,11 @@ module.exports = function(apps){
     const userController = require('../Controller/userController')
     const authController = require('../Controller/authController')
     const transactionController = require('../Controller/transactionController')
-    const verif = require('../Controller/verifytoken')
+    const mailerController = require('../Controller/mailerController')
+    const forgetController = require('../Controller/forgetController')
+    const auth = require('../Middleware/verifytoken')
 
+    //BELUM DITAMBAHKAN MIDDLEWARE (auth)
     apps.get('/',controler.hello)
     apps.get('/product',controler.getProduct)
     apps.post('/product',controler.postProduct)
@@ -21,7 +24,7 @@ module.exports = function(apps){
     apps.delete('/cart/:id', cartController.deleteCart)
     apps.patch('/cart/:id',cartController.updateCart)
 
-    apps.get('/user/:id',verif, userController.getUser)
+    apps.get('/user/:id',auth, userController.getUser)
     apps.post('/user', userController.postUser)
     apps.delete('/user/:id', userController.deleteUser)
     apps.patch('/user/:id', userController.updateUser)
@@ -30,10 +33,13 @@ module.exports = function(apps){
     apps.post('/transaction',transactionController.postTransaction)
 
     apps.post('/auth',authController.postAuth)
+    apps.patch('/auth/:id',authController.changeAuth)
 
     apps.get('/category', controler.getCategory)
     apps.post('/category', controler.postCategory)
 
+    apps.get('/mail', mailerController)
+    apps.patch('/forget/:id', forgetController.forgetPassword)
     
 
 }
