@@ -11,11 +11,22 @@ module.exports = function(apps){
     const mailerController = require('../Controller/mailerController')
     const forgetController = require('../Controller/forgetController')
     const auth = require('../Middleware/verifytoken')
+    const multer = require('multer')
 
-    //BELUM DITAMBAHKAN MIDDLEWARE (auth)
+    const storage = multer.diskStorage({
+        destination: function(req, file, callback){
+            callback(null,'./uploads');
+        },
+        filename: function(req, file, callback){
+            callback(null,file.originalname);
+        }
+    });
+
+    let upload = multer({storage: storage})
+    const verif = require('../Controller/verifytoken')
     apps.get('/',controler.hello)
     apps.get('/product',controler.getProduct)
-    apps.post('/product',controler.postProduct)
+    apps.post('/product',upload.single('image'), controler.postImage)
     apps.delete('/product/:id',controler.deleteProduct)
     apps.patch('/product/:id',controler.updateProduct)
 
@@ -25,21 +36,26 @@ module.exports = function(apps){
     apps.patch('/cart/:id',cartController.updateCart)
 
     apps.get('/user/:id',auth, userController.getUser)
-    apps.post('/user', userController.postUser)
+    apps.post('/user', upload.single('image'),userController.postUser)
+
     apps.delete('/user/:id', userController.deleteUser)
     apps.patch('/user/:id', userController.updateUser)
 
     apps.get('/transaction/:id',transactionController.getTransaction)
     apps.post('/transaction',transactionController.postTransaction)
+    apps.delete('/transaction', transactionController.deleteTransaction)
+    apps.patch('/transaction', transactionController.updateTransaction)
 
     apps.post('/auth',authController.postAuth)
+
     apps.patch('/auth/:id',authController.changeAuth)
+    apps.post('/upload',upload.single('image'), controler.postImage)
 
     apps.get('/category', controler.getCategory)
     apps.post('/category', controler.postCategory)
 
     apps.get('/mail', mailerController)
     apps.patch('/forget/:id', forgetController.forgetPassword)
-    
+
 
 }

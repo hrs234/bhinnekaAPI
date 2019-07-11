@@ -1,6 +1,7 @@
 'use strict'
 const conn = require('../Connection/connect')
 const response = require('../response/response')
+const cloudinary = require('cloudinary')
 
 exports.hello = (req,res) =>{   
     conn.query('select * from user', (error, rows) =>{
@@ -135,4 +136,51 @@ exports.getCategory = (req,res) =>{
             })
         }
     })
+}
+
+exports.postImage =  async (req,res) =>{
+    let path = req.file.path
+    let getUrl = async(req) =>{
+        cloudinary.config({
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY,
+            api_secret: process.env.CLOUDINARY_API_SECRET
+        })
+
+        let data 
+        await cloudinary.uploader.upload(path, (result) =>{ 
+            const fs = require('fs')
+            fs.unlinkSync(path) 
+            data = result.url
+        })
+        return data
+    }
+
+    let image = await getUrl()
+    let product = req.body.product
+    let price = req.body.price
+    let description = req.body.description
+    let id_user = req.body.id_user
+    let id_category = req.body.id_category
+
+    let sql = 'insert into product set product=?, price=?, description=?, image=?, id_user=?, id_category=?'
+
+    conn.query(sql,[product,price,description,image,id_user,id_category], (error, rows) =>{
+        if (error) {
+            console.log(error)
+        }else{
+            conn.query('select * from product order by id_product desc limit 1', (error, row) =>{
+                if (error) {
+                    console.log(error)
+                }else{
+                    res.send({
+                        data:row,
+                        message:"data has been save"
+                    })
+                }
+            })
+        }
+    })
+    
+
 }

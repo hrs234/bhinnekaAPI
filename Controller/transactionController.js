@@ -50,3 +50,38 @@ exports.postTransaction = (req, res) =>{
     })
 
 }
+
+exports.deleteTransaction = (req,res) =>{
+    let id = req.params.id
+    conn.query(`delete from transaction where id_transaction = ${id}`, (error, rows) =>{
+        if (error) {
+            console.log(error)
+        }else{
+            res.send({
+                message:"transaction has been delete"
+            })
+        }
+    })
+}
+
+exports.updateTransaction = (req,res) =>{
+    let id = req.params.id
+    let id_buy_methode = req.body.id_buy_methode
+    let id_product = req.body.id_product
+    let id_user = req.body.id_user
+    let id_role = req.body.id_role
+
+    let sql = `update transaction set id_buy_methode=${id_buy_methode}, id_product = ${id_product}, id_user = ${id_user}, id_role = ${id_role} where id_transaction = ${id} `
+
+    conn.query(sql, (error, rows) =>{
+        if(error){
+            console.log(error)
+        }else{
+            res.send({
+                message: 'data has been update'
+            })
+        }
+    })
+
+
+}

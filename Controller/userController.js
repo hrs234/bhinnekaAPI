@@ -2,8 +2,11 @@ const isEmpty = require('lodash.isempty');
 const Joi = require('joi')
 const response = require('../response/response');
 const connect = require('../Connection/connect');
+
 const bcrypt = require('bcrypt');
 const salt = bcrypt.genSaltSync(7);
+const cloudinary = require('cloudinary')
+
 
 exports.getUser = (req,res) =>{
     let id = req.params.id;
@@ -18,7 +21,25 @@ exports.getUser = (req,res) =>{
     }) 
 }
 
-exports.postUser = (req,res) =>{
+exports.postUser = async (req,res) =>{
+    let path = req.file.path
+    let getUrl = async(req) =>{
+        cloudinary.config({
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY,
+            api_secret: process.env.CLOUDINARY_API_SECRET
+        })
+
+        let data 
+        await cloudinary.uploader.upload(path, (result) =>{ 
+            const fs = require('fs')
+            fs.unlinkSync(path) 
+            data = result.url
+        })
+        return data
+    }
+
+    let image = await getUrl()
     let password = req.body.password
     let first_name = req.body.first_name
     let last_name = req.body.last_name
@@ -26,8 +47,9 @@ exports.postUser = (req,res) =>{
     let gender = req.body.gender
     let phone_number = req.body.phone_number
     let brith_date = req.body.birth_date
+    
     let sqlEmail = `select* from user where email = '${ email }'`
-    let sql = 'insert into user set first_name=?, last_name=?, email=?, phone_number=?, gender=?, birth_date=?, password=?'
+    let sql = 'insert into user set first_name=?, last_name=?, email=?, phone_number=?, gender=?, birth_date=?, password=?, image=?'
     
     let encryptPassword = bcrypt.hashSync(password, salt);
 
@@ -38,28 +60,34 @@ exports.postUser = (req,res) =>{
             })
         } else {
 
-            connect.query(`${sql}`,[first_name,last_name,email,phone_number,gender,brith_date,encryptPassword], (error, rows) =>{
+            connect.query(`${sql}`,[first_name,last_name,email,phone_number,gender,brith_date,encryptPassword,image], (error, rows) =>{
                 if (error) {
-                    console.log(error)
+                   console.log(error)
                 }else{
                     connect.query('select * from user order by id_user desc limit 1', (error, row) =>{
                         if (error){
+
                             console.log(error)
                         }else{
-                            res.send({
-                                status:200,
-                                data: row
+                            connect.query('select * from user order by id_user desc limit 1', (error, row) =>{
+                                if (error){
+                                    console.log(error)
+                                }else{
+                                    res.send({
+                                        status:200,
+                                        data: row
+                                    })
+                                }
                             })
                         }
                     })
+
                 }
             })
-
         }
     })
-
-
 }
+      
 
 exports.updateUser = (req, res) =>{
     let id = req.params.id
