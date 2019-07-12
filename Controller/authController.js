@@ -8,6 +8,7 @@ exports.postAuth = (req, res) => {
     let email = req.body.email
     let password = req.body.password
     let verifPass = ''
+    let id
 
     let sql = `select * from user where email='${email}'`
     const user = {
@@ -26,9 +27,16 @@ exports.postAuth = (req, res) => {
         console.log(decrypt)
         if (decrypt) {
             const token = jwt.sign({ user }, 'privateKey', { expiresIn: '3600s' })
+            rows.map((item) => {
+                (
+                    id = item.id_user
+                )
+            })
+            console.log(id)
+            id = id.toString()
             res.send({
                 message: 'login succes',
-                rows,
+                id,
                 token,
             })
         } else {
