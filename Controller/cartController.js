@@ -77,7 +77,7 @@ exports.postCart = (req, res) => {
 
 exports.deleteCart = (req, res) => {
     let id = req.params.id
-    let sql = `delete from cart where id_cart = ${id}`
+    let sql = `delete from cart where id_user = ${id}`
 
     conn.query(sql, (error, rows) => {
         if (error) {
