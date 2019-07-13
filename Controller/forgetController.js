@@ -2,16 +2,17 @@
 const conn = require('../Connection/connect')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
-const salt = bcrypt.genSaltSync(7);
 
 exports.forgetPassword = (req, res) => {
-    let id = req.params.id
+    const salt = bcrypt.genSaltSync(7);
+    let id = req.body.id
     let password = req.body.newPassword
     let email = ''
 
     //Ekripsi password baru
     let encryptPassword = bcrypt.hashSync(password, salt);
     console.log(password)
+    let sqlSelect = `select * from user where id_user='${id}'`
     let sql = `update user set password='${ encryptPassword }' where id_user=${ id }`
 
     conn.query(sqlSelect, async (error, rows, results) => {

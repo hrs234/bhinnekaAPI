@@ -39,7 +39,7 @@ exports.postUser = async (req,res) =>{
         return data
     }
 
-    let image = await getUrl()
+    let image = await getUrl() 
     let password = req.body.password
     let first_name = req.body.first_name
     let last_name = req.body.last_name
@@ -47,6 +47,8 @@ exports.postUser = async (req,res) =>{
     let gender = req.body.gender
     let phone_number = req.body.phone_number
     let brith_date = req.body.birth_date
+
+    console.log(image)
     
     let sqlEmail = `select* from user where email = '${ email }'`
     let sql = 'insert into user set first_name=?, last_name=?, email=?, phone_number=?, gender=?, birth_date=?, password=?, image=?'
