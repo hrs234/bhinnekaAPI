@@ -14,7 +14,7 @@ exports.getUser = (req,res) =>{
     console.log(bearerHeader)
     connect.query(`select * from user where id_user = ${id}`, (error, rows) =>{
         if(error){
-            console.log(error)
+            res.status(400)
         }else{
             response.fulfield(rows, res)
         }
@@ -22,6 +22,18 @@ exports.getUser = (req,res) =>{
 }
 
 exports.postUser = async (req,res) =>{
+    const dataEmpty = () => {
+        res
+        .status(400)
+        .send({
+            message: "Data can't be empty"
+        })
+    }
+
+    if(!req.file){
+        dataEmpty()
+        return
+    }
     let path = req.file.path
     let getUrl = async(req) =>{
         cloudinary.config({
@@ -39,16 +51,26 @@ exports.postUser = async (req,res) =>{
         return data
     }
 
-    let image = await getUrl() 
     let password = req.body.password
     let first_name = req.body.first_name
     let last_name = req.body.last_name
     let email = req.body.email
     let gender = req.body.gender
     let phone_number = req.body.phone_number
-    let brith_date = req.body.birth_date
+    let birth_date = req.body.birth_date
 
-    console.log(image)
+    if(!password || !first_name || !last_name || !email || !gender || !phone_number || !birth_date){
+        dataEmpty()
+        console.log('data diri')
+        return
+    }
+
+    let image = await getUrl() 
+    if(!image){
+        dataEmpty()
+        console.log('data image')
+        return
+    }
     
     let sqlEmail = `select* from user where email = '${ email }'`
     let sql = 'insert into user set first_name=?, last_name=?, email=?, phone_number=?, gender=?, birth_date=?, password=?, image=?'
@@ -62,7 +84,7 @@ exports.postUser = async (req,res) =>{
             })
         } else {
 
-            connect.query(`${sql}`,[first_name,last_name,email,phone_number,gender,brith_date,encryptPassword,image], (error, rows) =>{
+            connect.query(`${sql}`,[first_name,last_name,email,phone_number,gender,birth_date,encryptPassword,image], (error, rows) =>{
                 if (error) {
                    console.log(error)
                 }else{
@@ -91,16 +113,58 @@ exports.postUser = async (req,res) =>{
 }
       
 
-exports.updateUser = (req, res) =>{
+exports.updateUser = async (req, res) =>{
+    const dataEmpty = () => {
+        res
+        .status(400)
+        .send({
+            message: "Data can't be empty"
+        })
+    }
+
+    if(!req.file){
+        dataEmpty()
+        return
+    }
+    let path = req.file.path
+    let getUrl = async(req) =>{
+        cloudinary.config({
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY,
+            api_secret: process.env.CLOUDINARY_API_SECRET
+        })
+
+        let data 
+        await cloudinary.uploader.upload(path, (result) =>{ 
+            const fs = require('fs')
+            fs.unlinkSync(path) 
+            data = result.url
+        })
+        return data
+    }
+
     let id = req.params.id
     let first_name = req.body.first_name
     let last_name = req.body.last_name
     let email = req.body.email
     let gender = req.body.gender
     let phone_number = req.body.phone_number
-    let brith_date = req.body.birth_date
+    let birth_date = req.body.birth_date
 
-    let sql = `update user set first_name = "${first_name}", last_name = "${last_name}", email = "${email}", gender = "${gender}", phone_number = "${phone_number}", birth_date = "${brith_date}" where id_user = ${id}`
+    if(!id || !first_name || !last_name || !email || !gender || !phone_number || !birth_date){
+        dataEmpty()
+        console.log('data diri')
+        return
+    }
+
+    let image = await getUrl() 
+    if(!image){
+        dataEmpty()
+        console.log('data image')
+        return
+    }   
+
+    let sql = `update user set first_name = "${first_name}", image= "${ image }", last_name = "${last_name}", email = "${email}", gender = "${gender}", phone_number = "${phone_number}", birth_date = "${birth_date}" where id_user = ${id}`
 
     connect.query(sql, (error, rows) =>{
         if (error) {
@@ -117,6 +181,17 @@ exports.deleteUser = (req, res) =>{
     let id = req.params.id
     let sql = `delete from user where id_user = ${id}`
 
+    const dataEmpty = () => {
+        res
+        .status(400)
+        .send({
+            message: "Data can't be empty"
+        })
+    }
+
+    if(!id){
+        dataEmpty()
+    }
     connect.query(sql, (error, rows) =>{
         if (error) {
             console.log(error)

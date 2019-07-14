@@ -23,11 +23,24 @@ exports.getCart = (req, res) => {
 }
 
 exports.postCart = (req, res) => {
+    const dataEmpty = () => {
+        res
+        .status(400)
+        .send({
+            message: "Data can't be empty"
+        })
+    }
     let amount_purchase = req.body.amount_purchase
     let id_product = req.body.id_product
     let id_user = req.body.id_user
     let id_productCek = ''
     let firstAmount = ''
+
+    if(!amount_purchase || !id_product || !id_user){
+        dataEmpty()
+        return
+    }
+
     let sqlCheck = `SELECT * FROM cart join product on cart.id_product = product.id_product join user on cart.id_user = user.id_user where user.id_user = ${id_user}`
     let sql = 'insert into cart set amount_purchase=?, id_product=?, id_user=?'
 
@@ -91,10 +104,22 @@ exports.deleteCart = (req, res) => {
 }
 
 exports.updateCart = (req, res) => {
+    const dataEmpty = () => {
+        res
+        .status(400)
+        .send({
+            message: "Data can't be empty"
+        })
+    }
     let id = req.params.id
     let amount_purchase = req.body.amount_purchase
     let id_product = req.body.id_product
     let id_user = req.body.id_user
+
+    if(!id || !amount_purchase || !id_product || !id_user){
+        dataEmpty()
+        return
+    }
 
     let sql = `update cart set amount_purchase = ${amount_purchase}, id_product = ${id_product}, id_user=${id_user} where id_cart = ${id}`
 

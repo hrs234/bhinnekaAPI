@@ -2,6 +2,7 @@
 const conn = require('../Connection/connect')
 const response = require('../response/response')
 const isEmpty = require('lodash.isempty')
+const oneSignal = require('../Controller/oneSignalController')
 
 exports.getTransaction = (req, res) => {
     let id = req.query.id
@@ -33,28 +34,52 @@ exports.getTransaction = (req, res) => {
 }
 
 exports.postTransaction = (req, res) => {
+    const dataEmpty = () => {
+        res
+        .status(400)
+        .send({
+            message: "Data can't be empty"
+        })
+    }
+
     let id_buy_methode = req.body.id_buy_methode
     let id_product = req.body.id_product
     let id_user = req.body.id_user
     let id_role = req.body.id_role
     let id_address = req.body.id_address
-    let id_agent = req.body.id_address
+    let id_agent = req.body.id_agent
+    let productBuy = ''
+    let nameBuy = ''
 
+    if(!id_buy_methode || !id_product || !id_user || !id_role || !id_address || !id_agent){
+        dataEmpty()
+        return
+    }
+    console.log(id_address,id_agent,id_buy_methode,id_product,id_role,id_user)
     let sql = `insert into transaction set id_buy_methode = ?, id_product = ?, id_user = ?, id_role = ?, id_agent=?, id_address=?`
 
-    let defSql = `SELECT * FROM transaction join product on product.id_product = transaction.id_product join user on user.id_user = transaction.id_user join payment_role on payment_role.id__role = transaction.id_role join transaction_methode on transaction.id_buy_methode = transaction_methode.id_buy_methode join address on address.id_address = transaction.id_address order by user.id_user desc limit 1`
+    let defSql = `SELECT * FROM transaction join product on product.id_product = transaction.id_product join user on user.id_user = transaction.id_user join payment_role on payment_role.id__role = transaction.id_role join transaction_methode on transaction.id_buy_methode = transaction_methode.id_buy_methode join address on address.id_address = transaction.id_address where transaction.id_user = ${id_user} order by transaction.id_transaction desc limit 1`
 
     conn.query(sql, [id_buy_methode, id_product, id_user, id_role, id_agent, id_address], (error, rows) => {
         if (error) {
             console.log(error)
         } else {
-            conn.query(defSql, (error, row) => {
+            conn.query(defSql, (error, rows) => {
+                rows.map((item) => {
+                    (
+                        productBuy = item.product
+                    ),
+                    (
+                        nameBuy = item.first_name
+                    )
+                })
                 if (error) {
                     console.log(error)
                 } else {
                     res.send({
-                        data: row
+                        data: rows
                     })
+                    oneSignal(productBuy,nameBuy)
                 }
             })
         }
@@ -81,6 +106,11 @@ exports.updateTransaction = (req, res) => {
     let id_product = req.body.id_product
     let id_user = req.body.id_user
     let id_role = req.body.id_role
+
+    if(!id_buy_methode || !id_product || !id_user || !id_role || !id){
+        dataEmpty()
+        return
+    }
 
     let sql = `update transaction set id_buy_methode=${id_buy_methode}, id_product = ${id_product}, id_user = ${id_user}, id_role = ${id_role} where id_transaction = ${id} `
 

@@ -4,10 +4,25 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 
 exports.forgetPassword = (req, res) => {
+
+    const dataEmpty = () => {
+        res
+        .status(400)
+        .send({
+            message: "Data can't be empty"
+        })
+    }
+    
     const salt = bcrypt.genSaltSync(7);
     let id = req.body.id
     let password = req.body.newPassword
     let email = ''
+    
+    console.log(id, password)
+    if(!id || !password){
+        dataEmpty()
+        return
+    }
 
     //Ekripsi password baru
     let encryptPassword = bcrypt.hashSync(password, salt);

@@ -15,29 +15,51 @@ exports.hello = (req, res) => {
 }
 
 exports.postProduct = async (req, res) => {
+    const dataEmpty = () => {
+        res
+        .status(400)
+        .send({
+            message: "Data can't be empty"
+        })
+    }
+
+    if(!req.file){
+        dataEmpty()
+        return
+    }
+
     let path = req.file.path
-    let getUrl = async(req) =>{
+    let getUrl = async (req) => {
         cloudinary.config({
             cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
             api_key: process.env.CLOUDINARY_API_KEY,
             api_secret: process.env.CLOUDINARY_API_SECRET
         })
 
-        let data 
-        await cloudinary.uploader.upload(path, (result) =>{ 
+        let data
+        await cloudinary.uploader.upload(path, (result) => {
             const fs = require('fs')
-            fs.unlinkSync(path) 
+            fs.unlinkSync(path)
             data = result.url
         })
         return data
     }
 
-    let image = await getUrl() 
     let product = req.body.product
     let price = req.body.price
     let description = req.body.description
     let id_user = req.body.id_user
     let id_category = req.body.id_category
+    if(!product || !price || !description || !id_user || !id_category){
+        dataEmpty()
+        return
+    }
+
+    let image = await getUrl()
+    if(!image){
+        dataEmpty()
+        return
+    }
 
     let sql = 'insert into product set product=?, price=?, description=?, image=?, id_user=?, id_category=?'
 
@@ -45,7 +67,7 @@ exports.postProduct = async (req, res) => {
         if (error) {
             console.log(error)
         } else {
-            conn.query('select * from product order by id_product limit 1', (error, row) => {
+            conn.query('select * from product order by id_product desc limit 1', (error, row) => {
                 if (error) {
                     console.log(error)
                 } else {
@@ -58,11 +80,14 @@ exports.postProduct = async (req, res) => {
         }
     })
 
+
 }
 
 exports.getProduct = (req, res) => {
+
     let category = req.query.category
     let limit = req.query.limit
+
     let sql = 'select * from product'
     if (isEmpty(category)) {
         sql = sql
@@ -91,7 +116,18 @@ exports.getProduct = (req, res) => {
 }
 
 exports.deleteProduct = (req, res) => {
+    const dataEmpty = () => {
+        res
+        .status(400)
+        .send({
+            message: "Data can't be empty"
+        })
+    }
     let id = req.params.id
+    if(!id){
+        dataEmpty()
+        return
+    }
     let sql = `delete from product where id_product = ${id}`
 
     conn.query(sql, (error, rows) => {
@@ -105,14 +141,54 @@ exports.deleteProduct = (req, res) => {
     })
 }
 
-exports.updateProduct = (req, res) => {
+exports.updateProduct = async (req, res) => {
+    const dataEmpty = () => {
+        res
+        .status(400)
+        .send({
+            message: "Data can't be empty"
+        })
+    }
+
+    if(!req.file){
+        dataEmpty()
+        return
+    }
+
+    let path = req.file.path
+    let getUrl = async (req) => {
+        cloudinary.config({
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY,
+            api_secret: process.env.CLOUDINARY_API_SECRET
+        })
+
+        let data
+        await cloudinary.uploader.upload(path, (result) => {
+            const fs = require('fs')
+            fs.unlinkSync(path)
+            data = result.url
+        })
+        return data
+    }
+
     let id = req.params.id
     let product = req.body.product
     let price = req.body.price
     let description = req.body.description
-    let image = req.body.image
     let id_user = req.body.id_user
     let id_category = req.body.id_category
+    if(!id || !product || !price || !description || !id_user || !id_category){
+        dataEmpty()
+        console.log('data product')
+        return
+    }
+
+    let image = await getUrl()
+    if(!image){
+        dataEmpty()
+        return
+    }
 
     let sql = `update product set product= "${product}", price="${price}", description="${description}", image= "${image}", id_user = "${id_user}", id_category = "${id_category}" where id_product = ${id}`
 
@@ -161,51 +237,4 @@ exports.getCategory = (req, res) => {
             })
         }
     })
-}
-
-exports.postImage = async (req, res) => {
-    let path = req.file.path
-    let getUrl = async (req) => {
-        cloudinary.config({
-            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-            api_key: process.env.CLOUDINARY_API_KEY,
-            api_secret: process.env.CLOUDINARY_API_SECRET
-        })
-
-        let data
-        await cloudinary.uploader.upload(path, (result) => {
-            const fs = require('fs')
-            fs.unlinkSync(path)
-            data = result.url
-        })
-        return data
-    }
-
-    let image = await getUrl()
-    let product = req.body.product
-    let price = req.body.price
-    let description = req.body.description
-    let id_user = req.body.id_user
-    let id_category = req.body.id_category
-
-    let sql = 'insert into product set product=?, price=?, description=?, image=?, id_user=?, id_category=?'
-
-    conn.query(sql, [product, price, description, image, id_user, id_category], (error, rows) => {
-        if (error) {
-            console.log(error)
-        } else {
-            conn.query('select * from product order by id_product desc limit 1', (error, row) => {
-                if (error) {
-                    console.log(error)
-                } else {
-                    res.send({
-                        data: row,
-                        message: "data has been save"
-                    })
-                }
-            })
-        }
-    })
-
-
 }

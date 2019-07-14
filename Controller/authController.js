@@ -10,6 +10,18 @@ exports.postAuth = (req, res) => {
     let verifPass = ''
     let id
 
+    const dataEmpty = () => {
+        res
+        .status(400)
+        .send({
+            message: "Data can't be empty"
+        })
+    }
+
+    if(!email || !password){
+        dataEmpty()
+    }
+
     let sql = `select * from user where email='${email}'`
     const user = {
         email: email,
@@ -40,7 +52,7 @@ exports.postAuth = (req, res) => {
                 token,
             })
         } else {
-            res.send('Incorrect Email and Password')
+            res.send({message: 'Incorrect Email and Password'})
         }
     })
 }
@@ -51,6 +63,18 @@ exports.changeAuth = (req, res) => {
     let changePassword = req.body.newPassword
     let verifPass = ''
     let email = ''
+
+    const dataEmpty = () => {
+        res
+        .status(400)
+        .send({
+            message: "Data can't be empty"
+        })
+    }
+
+    if(!id || !password || !changePassword){
+        dataEmpty()
+    }
 
     //Ekripsi password baru
     let encryptPassword = bcrypt.hashSync(changePassword, salt);
@@ -80,7 +104,6 @@ exports.changeAuth = (req, res) => {
                     console.log(error)
                 }else{
                 console.log('Melewati update password')
-                console.log('password : ' + encryptPassword)
                     const user = {
                         email: email,
                         password: encryptPassword
@@ -94,7 +117,7 @@ exports.changeAuth = (req, res) => {
                 }
             })
         } else {
-            res.send('Incorrect Email and Password')
+            res.send({message:'Incorrect Email and Password'})
         }
     })
 }
